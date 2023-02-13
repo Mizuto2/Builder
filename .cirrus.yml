@@ -1,0 +1,97 @@
+env:
+    MANIFEST: https://github.com/LineageOS/android.git -b lineage-18.1
+    DEVICE: RMX2020
+    OEM: realme
+    DT_LINK: https://github.com/Realme-G70-Series/device_realme_RMX2020.git -b lineage-18.1-rmui1
+    DT_PATH: device/$OEM/$DEVICE
+    VT_LINK: https://github.com/Realme-G70-Series/vendor_realme_RMX2020.git
+    VT_PATH: vendor/$OEM/$DEVICE
+    KT_LINK: https://github.com/sarthakroy2002/kernel_realme_rmx2020.git -b Q
+    PLATFORM: mt6768
+    KT_PATH: kernel/$OEM/$DEVICE
+    TARGET: bacon
+    EXTRA_CMD: export SKIP_ABI_CHECKS=true
+    LUNCH_COMBO: lineage_${DEVICE}-userdebug
+    OUTPUT: LineageOS*.zip
+
+task:
+  name: "Setting Up, Syncing, Building and Uploading..."
+  timeout_in: 240m  
+  container:
+      image: ubuntu:20.04
+      cpu: 8
+      memory: 32G
+        
+  Build-Env-Setup_script:
+       - export DEBIAN_FRONTEND=noninteractive
+       - apt update
+       - apt install sudo
+       - DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata
+       - ln -sf /usr/share/zoneinfo/Asia/Dhaka /etc/localtime
+       - apt-get install -y tzdata
+       - dpkg-reconfigure --frontend noninteractive tzdata
+       - sudo apt update -y && sudo apt install git aria2 curl wget rsync zip unzip lzma cpio ccache clang -y
+       - sudo apt install python3 -y
+       - sudo ln -sf /usr/bin/python3 /usr/bin/python
+       - git config --global user.name "Rinto02"
+       - git config --global user.email "rintokhan411@gmail.com"
+       - git clone https://github.com/akhilnarang/scripts.git ~/scripts
+       - cd ~/scripts
+       - sudo bash setup/android_build_env.sh
+       - cd ~
+  
+  Storage-Checker_script:
+      - df -h
+      - lsblk
+      - ls -l -a -h
+  
+  Sync_script:
+      - echo "============================"
+      - echo "Syncing The Sources..."
+      - echo "============================"
+      - mkdir -p ~/work
+      - cd ~/work
+      - repo init -u $MANIFEST
+      - repo sync -j31 --force-sync --no-tags --no-clone-bundle
+      - git clone --depth=1 $DT_LINK $DT_PATH
+      - git clone --depth=1 $VT_LINK $VT_PATH
+      - git clone --depth=1 $KT_LINK $KT_PATH
+      - git clone --depth=1 https://github.com/Realme-G70-Series/android_packages_apps_RealmeParts -b lineage-18.1 packages/apps/RealmeParts
+      - git clone --depth=1 https://github.com/Realme-G70-Series/android_packages_apps_RealmeDirac -b lineage-18.1 packages/apps/RealmeDirac
+      - rm -rf platform/external/selinux
+      - git clone --depth=1 https://github.com/Los-FE/android_external_selinux -b lineage-18.1 external/selinux
+      - echo "============================"
+      - echo "Syncing Complete!"
+      - echo "============================"
+
+  Build_script:
+      - echo "============================"
+      - echo "Starting the Build..."
+      - echo "============================"
+      - cd ~/work
+      - $EXTRA_CMD
+      - export USE_CCACHE=1
+      - export CCACHE_EXEC=/usr/bin/ccache
+      - ccache -M 50G
+      - . build/envsetup.sh
+      - lunch lineage_RMX2020-userdebug
+      - mka bacon
+     
+  Upload_script:
+      - echo "============================"
+      - echo "Uploading the Build..."
+      - echo "============================"
+      - cd ~/work
+      - cd out/target/product/"$DEVICE"
+      - ls -lh
+      - pwd
+      - chmod 777 *
+      - curl --upload-file $(echo $OUTPUT) https://transfer.sh | tee link.txt && echo " "
+      - echo " "
+      - echo "============================"
+      - echo "Build Uploaded!"
+      - echo "Please see the link Below-  "
+      - echo "----------------------------"
+      - cat link.txt && echo " "
+      - echo "============================"
+        
