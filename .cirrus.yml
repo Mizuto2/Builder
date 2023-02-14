@@ -35,7 +35,7 @@ task:
       - mkdir -p ~/work
       - cd ~/work
       - repo init -u $MANIFEST
-      - repo sync
+      - repo sync -c -j1 --fail-fast --force-sync --no-clone-bundle --no-tags
       - git clone --depth=1 $DT_LINK $DT_PATH
       - git clone --depth=1 $VT_LINK $VT_PATH
       - git clone --depth=1 $KT_LINK $KT_PATH
