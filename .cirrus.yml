@@ -2,7 +2,7 @@ env:
     MANIFEST: https://gitlab.e.foundation/e/os/android.git -b v1-r --depth=1 --no-repo-verify
     DEVICE: RMX2020
     OEM: realme
-    DT_LINK: https://github.com/CyanFinchLing/device_realme_RMX2020.git -b lineage-18.1-rmui1
+    DT_LINK: https://github.com/Mizuto2/device_realme_RMX2020-1.git -b lineage-18.1-rmui1
     DT_PATH: device/$OEM/$DEVICE
     VT_LINK: https://github.com/Realme-G70-Series/vendor_realme_RMX2020.git
     VT_PATH: vendor/$OEM/$DEVICE
