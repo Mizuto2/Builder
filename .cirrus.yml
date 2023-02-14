@@ -4,6 +4,8 @@ env:
     OEM: realme
     DT_LINK: https://github.com/CyanFinchLing/device_realme_RMX2020.git -b lineage-18.1-rmui1
     DT_PATH: device/$OEM/$DEVICE
+    VT_LINK: https://github.com/Realme-G70-Series/vendor_realme_RMX2020.git
+    VT_PATH: vendor/$OEM/$DEVICE
     KT_LINK: https://github.com/sarthakroy2002/kernel_realme_rmx2020.git -b Q
     PLATFORM: mt6768
     KT_PATH: kernel/$OEM/$DEVICE
@@ -33,8 +35,9 @@ task:
       - mkdir -p ~/work
       - cd ~/work
       - repo init -u $MANIFEST
-      - repo sync -j8 --force-sync --no-tags --no-clone-bundle
+      - repo sync
       - git clone --depth=1 $DT_LINK $DT_PATH
+      - git clone --depth=1 $VT_LINK $VT_PATH
       - git clone --depth=1 $KT_LINK $KT_PATH
       - git clone --depth=1 https://github.com/Realme-G70-Series/android_packages_apps_RealmeParts -b lineage-18.1 packages/apps/RealmeParts
       - git clone --depth=1 https://github.com/Realme-G70-Series/android_packages_apps_RealmeDirac -b lineage-18.1 packages/apps/RealmeDirac
